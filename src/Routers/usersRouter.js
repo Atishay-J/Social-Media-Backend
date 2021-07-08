@@ -1,8 +1,11 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const Users = require("../../src/Models/userSchema");
 
 const router = new express.Router();
+
+const secret = process.env.JWT_SECRET;
 
 const checkIfUserExist = async (req, res, next) => {
   const { username, email } = req.body;
@@ -56,7 +59,10 @@ router.post("/signin", async (req, res) => {
       );
 
       if (isAuthSuccessful) {
-        return res.status(200).send("LOgged In");
+        let token = jwt.sign({ username: findUser.username }, secret, {
+          expiresIn: "1h",
+        });
+        return res.status(200).json({ token });
       }
       return res.status(401).send("Password Incorrect");
     }
