@@ -1,13 +1,13 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const Users = require("../../src/Models/userSchema");
+const Users = require("../Models/userSchema");
 
 const router = new express.Router();
 
 const secret = process.env.JWT_SECRET;
 
-const checkIfUserExist = async (req, res, next) => {
+const checkIfUserAlreadyExist = async (req, res, next) => {
   const { username, email } = req.body;
   const checkUsernameAvailabilty = await Users.findOne({
     username: username,
@@ -26,7 +26,7 @@ const checkIfUserExist = async (req, res, next) => {
   next();
 };
 
-router.post("/signup", checkIfUserExist, async (req, res) => {
+router.post("/signup", checkIfUserAlreadyExist, async (req, res) => {
   try {
     const { username, firstname, lastname, email, password } = req.body;
 
