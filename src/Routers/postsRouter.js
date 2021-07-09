@@ -31,9 +31,9 @@ router.post("/createpost", verifyToken, async (req, res) => {
 
     console.log("\n \n \n Autheticated \n \n \n ", authenticated);
 
-    const { userId, postContent } = req.body;
-    console.log("REquerst Body", userId);
-    const newPost = new Posts({ userId, postContent })
+    const { username, postContent } = req.body;
+    console.log("REquerst Body", username);
+    const newPost = new Posts({ username, postContent })
       .save()
       .then((response) => {
         return res.status(201).json(response);
@@ -41,6 +41,15 @@ router.post("/createpost", verifyToken, async (req, res) => {
       .catch((err) => {
         res.status(400).send(err);
       });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+router.post("/allposts", verifyToken, async (req, res) => {
+  try {
+    const allPosts = await Posts.find({});
+    res.status(200).json(allPosts);
   } catch (err) {
     res.status(500).send(err);
   }

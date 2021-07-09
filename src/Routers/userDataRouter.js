@@ -46,4 +46,25 @@ router.post("/userdata", verifyToken, async (req, res) => {
   res.send(userData);
 });
 
+router.post("/finduser", async (req, res) => {
+  console.log("Finding Usererrr", req.body);
+  try {
+    let { username, firstname, lastname, followers, following, posts, avatar } =
+      await Users.findOne({ username: req.body.username });
+    let userData = {
+      username,
+      firstname,
+      lastname,
+      followers,
+      following,
+      posts,
+      avatar,
+    };
+    console.log("Userdata", userData);
+    res.status(200).json(userData);
+  } catch (err) {
+    res.send(err);
+  }
+});
+
 module.exports = router;
