@@ -59,9 +59,7 @@ router.post("/signin", async (req, res) => {
       );
 
       if (isAuthSuccessful) {
-        let token = jwt.sign({ username: findUser.username }, secret, {
-          expiresIn: "1h",
-        });
+        let token = jwt.sign({ username: findUser.username }, secret);
         return res.status(200).json({ token });
       }
       return res.status(401).send("Password Incorrect");
