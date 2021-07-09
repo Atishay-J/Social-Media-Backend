@@ -6,11 +6,13 @@ require("./Db/conn");
 const app = express();
 const authRouter = require("./Routers/authRouter");
 const userDataRouter = require("./Routers/userDataRouter");
+const postsRouter = require("./Routers/postsRouter");
 
 app.use(cors());
 app.use(express.json());
 app.use(authRouter);
 app.use(userDataRouter);
+app.use(postsRouter);
 
 app.get("/", (req, res) => {
   res.send("Server is working");
