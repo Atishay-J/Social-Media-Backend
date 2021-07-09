@@ -23,19 +23,6 @@ const verifyToken = (req, res, next) => {
       next();
     }
   });
-
-  // jwt.verify(authToken, secret, (err, decoded) => {
-
-  //   if (err) {
-  //     if (err.name === "TokenExpiredError") {
-  //       return res.status(401).json({ message: "Session Expired" });
-  //     }
-  //     return res.status(400).json({ message: "Some Error Occured" });
-  //   }
-  //   return (res.locals.authenticated = decoded);
-  // });
-
-  // next();
 };
 
 router.post("/userdata", verifyToken, async (req, res) => {
@@ -43,7 +30,7 @@ router.post("/userdata", verifyToken, async (req, res) => {
 
   console.log("\n \n \n Autheticated \n \n \n ", authenticated);
 
-  let { username, firstname, lastname, followers, following, posts } =
+  let { username, firstname, lastname, followers, following, posts, avatar } =
     await Users.findOne({ username: authenticated.username });
 
   let userData = {
@@ -53,6 +40,7 @@ router.post("/userdata", verifyToken, async (req, res) => {
     followers,
     following,
     posts,
+    avatar,
   };
 
   res.send(userData);

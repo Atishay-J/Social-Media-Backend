@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Users = require("../Models/userSchema");
+const avatarGenerator = require("../Utils/avatarGenerator");
 
 const router = new express.Router();
 
@@ -30,7 +31,18 @@ router.post("/signup", checkIfUserAlreadyExist, async (req, res) => {
   try {
     const { username, firstname, lastname, email, password } = req.body;
 
-    const newUser = Users({ username, firstname, lastname, email, password });
+    const avatar = avatarGenerator(username);
+
+    console.log("\n \n \n Avatar ", avatar);
+
+    const newUser = Users({
+      username,
+      firstname,
+      lastname,
+      email,
+      password,
+      avatar,
+    });
     const hashedPassword = await bcrypt.hash(newUser.password, 10);
     newUser.password = hashedPassword;
     return newUser
@@ -62,7 +74,7 @@ router.post("/signin", async (req, res) => {
         let token = jwt.sign({ username: findUser.username }, secret);
         return res.status(200).json({ token });
       }
-      return res.status(401).send("Password Incorrect");
+      return res.status(401).send("Username or Password is Incorrect");
     }
     res.status(404).send("User does not exist");
   } catch (err) {
