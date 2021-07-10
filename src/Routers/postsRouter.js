@@ -55,4 +55,26 @@ router.post("/allposts", verifyToken, async (req, res) => {
   }
 });
 
+router.post("/post/togglelike", verifyToken, async (req, res) => {
+  try {
+    const { username, postId } = req.body;
+
+    const post = await Posts.findById(postId);
+    const alreadyLiked = post.likes.find((user) => user === username);
+
+    if (alreadyLiked) {
+      post.likes = post.likes.filter((user) => user !== username);
+    } else {
+      post.likes.push(username);
+    }
+
+    post
+      .save()
+      .then((response) => res.status(200).json(response))
+      .catch((err) => res.status(500).send(err));
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 module.exports = router;
