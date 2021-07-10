@@ -31,9 +31,9 @@ router.post("/createpost", verifyToken, async (req, res) => {
 
     console.log("\n \n \n Autheticated \n \n \n ", authenticated);
 
-    const { username, postContent } = req.body;
+    const { username, postContent, avatar } = req.body;
     console.log("REquerst Body", username);
-    const newPost = new Posts({ username, postContent })
+    const newPost = new Posts({ username, postContent, avatar })
       .save()
       .then((response) => {
         return res.status(201).json(response);
