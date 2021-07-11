@@ -1,29 +1,8 @@
 const express = require("express");
-const jwt = require("jsonwebtoken");
 const Posts = require("../Models/postSchema");
+const verifyToken = require("../Middleware/verifyToken");
 
 const router = new express.Router();
-const secret = process.env.JWT_SECRET;
-
-const verifyToken = (req, res, next) => {
-  let authToken = req.headers.authorization;
-
-  jwt.verify(authToken, secret, (err, decoded) => {
-    if (err) {
-      if (err.name === "TokenExpiredError") {
-        console.log("\n \n \n Token Expired Error ");
-        return res.status(401).json({ message: "Session Expired" });
-      }
-
-      console.log("\n \n \n Some Error Occured ");
-      return res.status(400).json({ message: "Some Error Occured" });
-    } else {
-      console.log("\n \n \n Auth Granted ");
-      res.locals.authenticated = decoded;
-      next();
-    }
-  });
-};
 
 router.post("/createpost", verifyToken, async (req, res) => {
   try {
