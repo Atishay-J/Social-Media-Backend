@@ -18,6 +18,6 @@ app.get("/", (req, res) => {
   res.send("Server is working");
 });
 
-const PORT = 8000 || process.env.PORT;
+const PORT = process.env.PORT || 8000;
 
 app.listen(PORT, () => console.log("Server Started on Port", PORT));
