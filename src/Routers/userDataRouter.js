@@ -47,4 +47,13 @@ router.post("/finduser", async (req, res) => {
   }
 });
 
+router.post("/togglefollow", verifyToken, async (req, res) => {
+  try {
+    const { username, follower } = req.body;
+    res.json({ username, follower });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 module.exports = router;
