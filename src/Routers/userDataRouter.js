@@ -69,6 +69,27 @@ router.post("/finduser", async (req, res) => {
   }
 });
 
+router.post("/search", async (req, res) => {
+  try {
+    let { username } = req.body;
+
+    console.log(" \n \n GOT INT BODYY \n ", username);
+
+    if (username) {
+      let { username, firstname, lastname, avatar, bio } = await Users.findOne({
+        username: req.body.username,
+      });
+
+      return res
+        .status(200)
+        .json({ username, firstname, lastname, avatar, bio });
+    }
+    res.status(400).send("Some Error Occured");
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 router.post("/togglefollow", verifyToken, async (req, res) => {
   try {
     const { username, followingTo } = req.body;
