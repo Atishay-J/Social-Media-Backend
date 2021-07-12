@@ -28,14 +28,17 @@ router.post("/createpost", verifyToken, async (req, res) => {
 
     const { username, postContent, avatar, postImg } = req.body;
 
-    const newPost = new Posts({ username, postContent, avatar, postImg })
-      .save()
-      .then((response) => {
-        return res.status(201).json(response);
-      })
-      .catch((err) => {
-        res.status(400).send(err);
-      });
+    if (postContent || postImg) {
+      return await new Posts({ username, postContent, avatar, postImg })
+        .save()
+        .then((response) => {
+          res.status(201).json(response);
+        })
+        .catch((err) => {
+          res.status(400).send(err);
+        });
+    }
+    res.status(400).send("Some Error Occured");
   } catch (err) {
     res.status(500).send(err);
   }
