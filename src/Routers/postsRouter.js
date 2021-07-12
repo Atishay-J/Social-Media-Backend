@@ -55,18 +55,21 @@ router.post("/post/togglelike", verifyToken, async (req, res) => {
     const { username, postId } = req.body;
 
     const post = await Posts.findById(postId);
-    const alreadyLiked = post.likes.find((user) => user === username);
+    if (username) {
+      const alreadyLiked = post.likes.find((user) => user === username);
 
-    if (alreadyLiked) {
-      post.likes = post.likes.filter((user) => user !== username);
-    } else {
-      post.likes.push(username);
+      if (alreadyLiked) {
+        post.likes = post.likes.filter((user) => user !== username);
+      } else {
+        post.likes.push(username);
+      }
+
+      return post
+        .save()
+        .then((response) => res.status(200).json(response))
+        .catch((err) => res.status(500).send(err));
     }
-
-    post
-      .save()
-      .then((response) => res.status(200).json(response))
-      .catch((err) => res.status(500).send(err));
+    res.status(400).send("Some Error Occured");
   } catch (err) {
     res.status(500).send(err);
   }
