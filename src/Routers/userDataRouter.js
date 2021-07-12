@@ -49,10 +49,46 @@ router.post("/finduser", async (req, res) => {
 
 router.post("/togglefollow", verifyToken, async (req, res) => {
   try {
-    const { username, follower } = req.body;
-    res.json({ username, follower });
+    const { username, followingTo } = req.body;
+
+    //Updating On LoggedIn User's Account
+
+    const findUser = await Users.findOne({ username });
+
+    const checkIfAlreadyFollowing = findUser.following.find(
+      (username) => username === followingTo
+    );
+
+    if (checkIfAlreadyFollowing) {
+      findUser.following = findUser.following.filter(
+        (username) => username !== followingTo
+      );
+    } else {
+      findUser.following.push(followingTo);
+    }
+
+    //Updating On Following Person's Account
+
+    const findFollowingTo = await Users.findOne({ username: followingTo });
+
+    const checkIfAlreadyFollowed = findFollowingTo.followers.find(
+      (follower) => follower === username
+    );
+
+    if (checkIfAlreadyFollowed) {
+      findFollowingTo.followers = findFollowingTo.followers.filter(
+        (follower) => follower !== username
+      );
+    } else {
+      findFollowingTo.followers.push(username);
+    }
+
+    findUser.save();
+    findFollowingTo.save();
+
+    res.status(200).json({ User: findUser, followingTo: findFollowingTo });
   } catch (err) {
-    res.status(500).send(err);
+    res.send(err);
   }
 });
 
