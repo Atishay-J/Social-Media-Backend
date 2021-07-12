@@ -10,8 +10,17 @@ router.post("/userdata", verifyToken, async (req, res) => {
 
   console.log("\n \n \n Autheticated \n \n \n ", authenticated);
 
-  let { username, firstname, lastname, followers, following, posts, avatar } =
-    await Users.findOne({ username: authenticated.username });
+  let {
+    username,
+    firstname,
+    lastname,
+    followers,
+    following,
+    posts,
+    avatar,
+    bio,
+    location,
+  } = await Users.findOne({ username: authenticated.username });
 
   let userData = {
     username,
@@ -21,6 +30,8 @@ router.post("/userdata", verifyToken, async (req, res) => {
     following,
     posts,
     avatar,
+    bio,
+    location,
   };
 
   res.send(userData);
@@ -29,8 +40,17 @@ router.post("/userdata", verifyToken, async (req, res) => {
 router.post("/finduser", async (req, res) => {
   console.log("Finding Usererrr", req.body);
   try {
-    let { username, firstname, lastname, followers, following, posts, avatar } =
-      await Users.findOne({ username: req.body.username });
+    let {
+      username,
+      firstname,
+      lastname,
+      followers,
+      following,
+      posts,
+      avatar,
+      bio,
+      location,
+    } = await Users.findOne({ username: req.body.username });
     let userData = {
       username,
       firstname,
@@ -39,6 +59,8 @@ router.post("/finduser", async (req, res) => {
       following,
       posts,
       avatar,
+      bio,
+      location,
     };
     console.log("Userdata", userData);
     res.status(200).json(userData);
@@ -88,6 +110,24 @@ router.post("/togglefollow", verifyToken, async (req, res) => {
 
     res.status(200).json({ User: findUser, followingTo: findFollowingTo });
   } catch (err) {
+    res.send(err);
+  }
+});
+
+router.post("/updateprofile", verifyToken, async (req, res) => {
+  try {
+    const { firstname, lastname, bio, location } = req.body;
+
+    let authenticated = res.locals.authenticated;
+
+    await Users.findOneAndUpdate(
+      { username: authenticated.username },
+      { firstname, lastname, bio, location }
+    )
+      .then((response) => res.status(200).send("Profile Updated"))
+      .catch((err) => res.status(500).send("Some Error Occured ", err));
+  } catch (err) {
+    console.log("/n /n Some Errorr", err);
     res.send(err);
   }
 });

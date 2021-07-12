@@ -9,6 +9,8 @@ const UserSchema = new mongoose.Schema({
   followers: [],
   following: [],
   avatar: String,
+  bio: String,
+  location: String,
   posts: [],
 });
 
