@@ -1,7 +1,9 @@
 const express = require("express");
 const Posts = require("../Models/postSchema");
+const Users = require("../Models/userSchema");
 const verifyToken = require("../Middleware/verifyToken");
 const ImageKit = require("imagekit");
+const createNewNotification = require("../Utils/notificationGenerator");
 
 const router = new express.Router();
 
@@ -26,12 +28,15 @@ router.post("/createpost", verifyToken, async (req, res) => {
   try {
     let authenticated = res.locals.authenticated;
 
-    const { username, postContent, avatar, postImg } = req.body;
+    const { userId, username, postContent, avatar, postImg } = req.body;
+
+    console.log("\n \n Usre ID of create Post \n ", userId);
 
     if (postContent || postImg) {
-      return await new Posts({ username, postContent, avatar, postImg })
+      return await new Posts({ userId, username, postContent, avatar, postImg })
         .save()
         .then((response) => {
+          console.log("\n \n Response \n", response);
           res.status(201).json(response);
         })
         .catch((err) => {
@@ -55,7 +60,19 @@ router.post("/allposts", verifyToken, async (req, res) => {
 
 router.post("/post/togglelike", verifyToken, async (req, res) => {
   try {
-    const { username, postId } = req.body;
+    const { username, postId, userId, postAuthorId } = req.body;
+
+    //===================
+    // TEST Zone
+
+    console.log("\n \n THe NEW USER \n \n ", req.body);
+
+    // const newUser = await Users.findOne({ username });
+
+    // console.log("\n \n THe NEW USER \n \n ", newUser);
+    // console.log("\n \n User ID ARE EQUAL \n ", newUser._id === userId);
+
+    //====================
 
     const post = await Posts.findById(postId);
     if (username) {
@@ -65,6 +82,7 @@ router.post("/post/togglelike", verifyToken, async (req, res) => {
         post.likes = post.likes.filter((user) => user !== username);
       } else {
         post.likes.push(username);
+        createNewNotification(userId, postAuthorId, "LIKE");
       }
 
       return post
@@ -74,6 +92,7 @@ router.post("/post/togglelike", verifyToken, async (req, res) => {
     }
     res.status(400).send("Some Error Occured");
   } catch (err) {
+    console.log("\n \n Errorrrrrrr232323", err);
     res.status(500).send(err);
   }
 });

@@ -1,6 +1,7 @@
 const express = require("express");
 const Users = require("../Models/userSchema");
 const verifyToken = require("../Middleware/verifyToken");
+const createNewNotification = require("../Utils/notificationGenerator");
 
 const router = new express.Router();
 const secret = process.env.JWT_SECRET;
@@ -11,6 +12,7 @@ router.post("/userdata", verifyToken, async (req, res) => {
   console.log("\n \n \n Autheticated \n \n \n ", authenticated);
 
   let {
+    _id,
     username,
     firstname,
     lastname,
@@ -23,6 +25,7 @@ router.post("/userdata", verifyToken, async (req, res) => {
   } = await Users.findOne({ username: authenticated.username });
 
   let userData = {
+    _id,
     username,
     firstname,
     lastname,
@@ -41,6 +44,7 @@ router.post("/finduser", async (req, res) => {
   console.log("Finding Usererrr", req.body);
   try {
     let {
+      _id,
       username,
       firstname,
       lastname,
@@ -52,6 +56,7 @@ router.post("/finduser", async (req, res) => {
       location,
     } = await Users.findOne({ username: req.body.username });
     let userData = {
+      _id,
       username,
       firstname,
       lastname,
@@ -92,7 +97,7 @@ router.post("/search", async (req, res) => {
 
 router.post("/togglefollow", verifyToken, async (req, res) => {
   try {
-    const { username, followingTo } = req.body;
+    const { username, userId, followingTo, followingToId } = req.body;
 
     //Updating On LoggedIn User's Account
 
@@ -103,11 +108,13 @@ router.post("/togglefollow", verifyToken, async (req, res) => {
     );
 
     if (checkIfAlreadyFollowing) {
+      console.log("\n Alreday follwing \n");
       findUser.following = findUser.following.filter(
         (username) => username !== followingTo
       );
     } else {
       findUser.following.push(followingTo);
+      console.log("\n Created follwing \n");
     }
 
     //Updating On Following Person's Account
@@ -124,6 +131,7 @@ router.post("/togglefollow", verifyToken, async (req, res) => {
       );
     } else {
       findFollowingTo.followers.push(username);
+      createNewNotification(userId, followingToId, "NEWFOLLOWER");
     }
 
     findUser.save();
