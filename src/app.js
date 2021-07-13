@@ -4,7 +4,7 @@ require("dotenv").config();
 require("./Db/conn");
 
 const app = express();
-app.use(cors());
+app.use(cors({ credentials: true, origin: true }));
 const authRouter = require("./Routers/authRouter");
 const userDataRouter = require("./Routers/userDataRouter");
 const postsRouter = require("./Routers/postsRouter");
