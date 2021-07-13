@@ -62,18 +62,6 @@ router.post("/post/togglelike", verifyToken, async (req, res) => {
   try {
     const { username, postId, userId, postAuthorId } = req.body;
 
-    //===================
-    // TEST Zone
-
-    console.log("\n \n THe NEW USER \n \n ", req.body);
-
-    // const newUser = await Users.findOne({ username });
-
-    // console.log("\n \n THe NEW USER \n \n ", newUser);
-    // console.log("\n \n User ID ARE EQUAL \n ", newUser._id === userId);
-
-    //====================
-
     const post = await Posts.findById(postId);
     if (username) {
       const alreadyLiked = post.likes.find((user) => user === username);
@@ -94,6 +82,51 @@ router.post("/post/togglelike", verifyToken, async (req, res) => {
   } catch (err) {
     console.log("\n \n Errorrrrrrr232323", err);
     res.status(500).send(err);
+  }
+});
+
+router.post("/post/addcomment", verifyToken, async (req, res) => {
+  try {
+    const { userId, comment, postId, username, lastname, firstname, avatar } =
+      req.body;
+
+    const findPost = await Posts.findById(postId);
+
+    console.log("\n POSTT \n ", findPost);
+
+    if (comment) {
+      findPost.comments.push({
+        userId,
+        comment,
+        username,
+        lastname,
+        firstname,
+        avatar,
+      });
+
+      return findPost
+        .save()
+        .then((response) => res.status(200).json(response))
+        .catch((err) => console.log("Error while saving commenit", err));
+    }
+    res.status(400).send("Bad Request");
+  } catch (err) {
+    console.log("Error while adding comment", err);
+  }
+});
+
+router.post("/findpost/:postId", async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    await Posts.findById(postId)
+      .then((response) => res.status(200).json(response))
+      .catch((err) => {
+        console.log("Error while fetchiing post", err);
+        res.status(404).send("Not found");
+      });
+  } catch (err) {
+    console.log("error fetch post ", err);
   }
 });
 
