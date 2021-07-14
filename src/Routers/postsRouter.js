@@ -28,12 +28,28 @@ router.post("/createpost", verifyToken, async (req, res) => {
   try {
     let authenticated = res.locals.authenticated;
 
-    const { userId, username, postContent, avatar, postImg } = req.body;
+    const {
+      userId,
+      username,
+      postContent,
+      avatar,
+      postImg,
+      firstname,
+      lastname,
+    } = req.body;
 
     console.log("\n \n Usre ID of create Post \n ", userId);
 
     if (postContent || postImg) {
-      return await new Posts({ userId, username, postContent, avatar, postImg })
+      return await new Posts({
+        userId,
+        username,
+        postContent,
+        avatar,
+        postImg,
+        firstname,
+        lastname,
+      })
         .save()
         .then((response) => {
           console.log("\n \n Response \n", response);

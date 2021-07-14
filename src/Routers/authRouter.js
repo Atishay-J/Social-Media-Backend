@@ -60,6 +60,8 @@ router.post("/signin", async (req, res) => {
   try {
     const { usernameOrEmail, password } = req.body;
 
+    console.log("THINGSgd \n", usernameOrEmail, password);
+
     const findUser = await Users.findOne({
       $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }],
     });
