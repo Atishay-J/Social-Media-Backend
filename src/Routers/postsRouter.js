@@ -110,6 +110,19 @@ router.post("/post/addcomment", verifyToken, async (req, res) => {
 
     console.log("\n POSTT \n ", findPost);
 
+    console.log(
+      "\n \n New Notification \n",
+      "SOurceusername : ",
+      username,
+      "suoce Id",
+      userId,
+      "\n",
+      "tagetNmae: ",
+      findPost.username,
+      "tagert iD: ",
+      findPost.userId
+    );
+
     if (comment) {
       findPost.comments.push({
         userId,
@@ -119,6 +132,8 @@ router.post("/post/addcomment", verifyToken, async (req, res) => {
         firstname,
         avatar,
       });
+
+      createNewNotification(userId, findPost.userId, "COMMENT");
 
       return findPost
         .save()
