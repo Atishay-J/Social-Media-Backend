@@ -22,6 +22,7 @@ router.post("/userdata", verifyToken, async (req, res) => {
     avatar,
     bio,
     location,
+    wallColor,
   } = await Users.findOne({ username: authenticated.username });
 
   let userData = {
@@ -35,6 +36,7 @@ router.post("/userdata", verifyToken, async (req, res) => {
     avatar,
     bio,
     location,
+    wallColor,
   };
 
   res.send(userData);
@@ -54,6 +56,7 @@ router.post("/finduser", async (req, res) => {
       avatar,
       bio,
       location,
+      wallColor,
     } = await Users.findOne({ username: req.body.username });
     let userData = {
       _id,
@@ -66,6 +69,7 @@ router.post("/finduser", async (req, res) => {
       avatar,
       bio,
       location,
+      wallColor,
     };
     console.log("Userdata", userData);
     res.status(200).json(userData);
@@ -77,8 +81,6 @@ router.post("/finduser", async (req, res) => {
 router.post("/search", async (req, res) => {
   try {
     let { username } = req.body;
-
-    console.log(" \n \n GOT INT BODYY \n ", username);
 
     if (username) {
       let { username, firstname, lastname, avatar, bio } = await Users.findOne({
@@ -145,13 +147,22 @@ router.post("/togglefollow", verifyToken, async (req, res) => {
 
 router.post("/updateprofile", verifyToken, async (req, res) => {
   try {
-    const { firstname, lastname, bio, location } = req.body;
+    const { firstname, lastname, bio, location, wallColor } = req.body;
 
     let authenticated = res.locals.authenticated;
 
+    if (wallColor) {
+      return await Users.findOneAndUpdate(
+        { username: authenticated.username },
+        { wallColor }
+      )
+        .then((response) => res.status(200).send("Wall Updated"))
+        .catch((err) => res.status(500).send("Some Error Occured ", err));
+    }
+
     await Users.findOneAndUpdate(
       { username: authenticated.username },
-      { firstname, lastname, bio, location }
+      { firstname, lastname, bio, location, wallColor }
     )
       .then((response) => res.status(200).send("Profile Updated"))
       .catch((err) => res.status(500).send("Some Error Occured ", err));
