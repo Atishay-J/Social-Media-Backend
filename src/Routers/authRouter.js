@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Users = require("../Models/userSchema");
 const avatarGenerator = require("../Utils/avatarGenerator");
+const verifyToken = require("../Middleware/verifyToken");
 
 const router = new express.Router();
 
@@ -82,6 +83,32 @@ router.post("/signin", async (req, res) => {
     res.status(404).send("User does not exist");
   } catch (err) {
     res.status(500).send(err);
+  }
+});
+
+router.post("/updatePassword", verifyToken, async (req, res) => {
+  try {
+    let { currentPassword, newPassword, username } = req.body;
+
+    const findUser = await Users.findOne({ username });
+
+    if (findUser) {
+      const isAuthSuccessful = await bcrypt.compare(
+        currentPassword,
+        findUser.password
+      );
+
+      if (isAuthSuccessful) {
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        return await Users.updateOne({ username }, { password: hashedPassword })
+          .then((response) => res.status(200).send("Updated"))
+          .catch((err) => console.log("Errorrrrr", err));
+      }
+      return res.status(401).send("Username or Password is Incorrect");
+    }
+  } catch (err) {
+    res.status(500).send("some error occured");
   }
 });
 
