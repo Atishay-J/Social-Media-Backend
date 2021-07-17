@@ -161,4 +161,21 @@ router.post("/findpost/:postId", async (req, res) => {
   }
 });
 
+router.post("/post/delete", verifyToken, async (req, res) => {
+  try {
+    let { postId, userId } = req.body;
+
+    let foundPost = await Posts.findById(postId);
+
+    if (foundPost.userId === userId) {
+      let removePost = await Posts.deleteOne({ _id: postsId });
+      return res.status(200).json(removePost);
+    } else {
+      res.status(401).send("Unatuhtorised");
+    }
+  } catch (err) {
+    res.send(500).send("Some Error Occured");
+  }
+});
+
 module.exports = router;
