@@ -8,7 +8,7 @@ const verifyToken = require("../Middleware/verifyToken");
 const router = new express.Router();
 
 const secret = process.env.JWT_SECRET;
-
+const guest = process.env.GUEST_USERNAME;
 const checkIfUserAlreadyExist = async (req, res, next) => {
   const { username, email } = req.body;
   const checkUsernameAvailabilty = await Users.findOne({
@@ -33,8 +33,6 @@ router.post("/signup", checkIfUserAlreadyExist, async (req, res) => {
     const { username, firstname, lastname, email, password } = req.body;
 
     const avatar = avatarGenerator(username);
-
-    console.log("\n \n \n Avatar ", avatar);
 
     const newUser = Users({
       username,
@@ -61,8 +59,6 @@ router.post("/signin", async (req, res) => {
   try {
     const { usernameOrEmail, password } = req.body;
 
-    console.log("THINGSgd \n", usernameOrEmail, password);
-
     const findUser = await Users.findOne({
       $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }],
     });
@@ -75,12 +71,22 @@ router.post("/signin", async (req, res) => {
 
       if (isAuthSuccessful) {
         let token = jwt.sign({ username: findUser.username }, secret);
-        console.log("TOkkkkkeeen \n", token);
         return res.status(200).json({ token });
       }
       return res.status(401).send("Username or Password is Incorrect");
     }
     res.status(404).send("User does not exist");
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+router.post("/guestuser", async (req, res) => {
+  try {
+    const findUser = await Users.findOne({ username: guest });
+
+    let token = jwt.sign({ username: findUser.username }, secret);
+    return res.status(200).json({ token });
   } catch (err) {
     res.status(500).send(err);
   }
@@ -103,7 +109,7 @@ router.post("/updatePassword", verifyToken, async (req, res) => {
 
         return await Users.updateOne({ username }, { password: hashedPassword })
           .then((response) => res.status(200).send("Updated"))
-          .catch((err) => console.log("Errorrrrr", err));
+          .catch((err) => console.log("Error occured", err));
       }
       return res.status(401).send("Username or Password is Incorrect");
     }
