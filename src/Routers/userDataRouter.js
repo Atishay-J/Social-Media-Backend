@@ -9,8 +9,6 @@ const secret = process.env.JWT_SECRET;
 router.post("/userdata", verifyToken, async (req, res) => {
   let authenticated = res.locals.authenticated;
 
-  console.log("\n \n \n Autheticated \n \n \n ", authenticated);
-
   let {
     _id,
     username,
@@ -43,7 +41,6 @@ router.post("/userdata", verifyToken, async (req, res) => {
 });
 
 router.post("/finduser", async (req, res) => {
-  console.log("Finding Usererrr", req.body);
   try {
     let {
       _id,
@@ -71,7 +68,6 @@ router.post("/finduser", async (req, res) => {
       location,
       wallColor,
     };
-    console.log("Userdata", userData);
     res.status(200).json(userData);
   } catch (err) {
     res.send(err);
