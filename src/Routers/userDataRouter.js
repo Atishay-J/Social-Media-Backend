@@ -158,7 +158,7 @@ router.post("/updateprofile", verifyToken, async (req, res) => {
 
     await Users.findOneAndUpdate(
       { username: authenticated.username },
-      { firstname, lastname, bio, location, wallColor }
+      { firstname, lastname, bio, location }
     )
       .then((response) => res.status(200).send("Profile Updated"))
       .catch((err) => res.status(500).send("Some Error Occured ", err));
